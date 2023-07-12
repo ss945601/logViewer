@@ -1,17 +1,17 @@
-import 'package:arb_flutter/bloc/file_browser_bloc.dart';
+import 'package:latticework/bloc/file_browser_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 FileBrowserBloc _fileBrowserBloc = FileBrowserBloc();
 
-class FileBrowser extends StatefulWidget {
-  const FileBrowser({super.key});
+class FileBrowserPage extends StatefulWidget {
+  const FileBrowserPage({super.key});
 
   @override
-  State<FileBrowser> createState() => _FileBrowserState();
+  State<FileBrowserPage> createState() => _FileBrowserPageState();
 }
 
-class _FileBrowserState extends State<FileBrowser> {
+class _FileBrowserPageState extends State<FileBrowserPage> {
   int currentIdx = 0;
   int dataSize = 0;
   final int shift = 50;
@@ -31,29 +31,24 @@ class _FileBrowserState extends State<FileBrowser> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Arb editor"),
-      ),
-      body: StreamBuilder<String>(
-          stream: _fileBrowserBloc.selectFolderStream,
-          builder: (context, selectFolderSnapshot) {
-            var path = selectFolderSnapshot.data.toString();
-            return Container(
-              child: Column(
-                children: [
-                  SelectPathBar(path),
-                  TableView(),
-                  Spacer(),
-                  HintSection(),
-                  Spacer(),
-                  if (dataSize > 0) PageNumButton(),
-                  Spacer(),
-                ],
-              ),
-            );
-          }),
-    );
+    return StreamBuilder<String>(
+        stream: _fileBrowserBloc.selectFolderStream,
+        builder: (context, selectFolderSnapshot) {
+          var path = selectFolderSnapshot.data.toString();
+          return Container(
+            child: Column(
+              children: [
+                SelectPathBar(path),
+                TableView(),
+                Spacer(),
+                HintSection(),
+                Spacer(),
+                if (dataSize > 0) PageNumButton(),
+                Spacer(),
+              ],
+            ),
+          );
+        });
   }
 
   Expanded PageNumButton() {
@@ -105,7 +100,7 @@ class _FileBrowserState extends State<FileBrowser> {
             label: Text("Open arb folder")),
         if (dataSize > 0)
           TextButton.icon(
-              icon:Icon(Icons.add),
+              icon: Icon(Icons.add),
               style: TextButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(0),
@@ -121,7 +116,7 @@ class _FileBrowserState extends State<FileBrowser> {
               label: Text("Add Data")),
         if (dataSize > 0)
           TextButton.icon(
-            icon: Icon(Icons.save),
+              icon: Icon(Icons.save),
               style: TextButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(0),
@@ -133,7 +128,7 @@ class _FileBrowserState extends State<FileBrowser> {
               },
               label: Text("Save Data")),
         TextButton.icon(
-            icon:Icon(Icons.import_export),
+            icon: Icon(Icons.import_export),
             style: TextButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(0),
@@ -146,7 +141,7 @@ class _FileBrowserState extends State<FileBrowser> {
             label: Text("Open csv")),
         if (dataSize > 0)
           TextButton.icon(
-            icon:Icon(Icons.import_export),
+              icon: Icon(Icons.import_export),
               style: TextButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(0),

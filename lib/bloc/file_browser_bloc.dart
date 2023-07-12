@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:arb_flutter/model/arb_model.dart';
+import 'package:latticework/model/arb_model.dart';
 import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:rxdart/rxdart.dart';
