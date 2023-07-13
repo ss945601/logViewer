@@ -117,6 +117,9 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
                 EasyLoading.dismiss();
                 isApplyFilter = false;
               });
+            }).onError((error, stackTrace) {
+              EasyLoading.dismiss();
+              isApplyFilter = false;
             });
           },
           label: Text("Open file")),
@@ -152,8 +155,7 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
                         selection: const TextSelection.collapsed(offset: 0));
                     isApplyFilter = true;
                   });
-                }
-                else{
+                } else {
                   var newContent = _logAnalysisBloc.originalContent();
                   setState(() {
                     _controller = qUtil.QuillController(
@@ -181,7 +183,8 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
             TextButton(
               child: Text('Apply'),
               onPressed: () {
-                DialogContent.textFields.removeWhere((element) => element == "");
+                DialogContent.textFields
+                    .removeWhere((element) => element == "");
                 // Handle the apply action here
                 Navigator.of(context).pop();
               },

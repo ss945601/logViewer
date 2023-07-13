@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:rxdart/subjects.dart';
 
 class LogAnalysisBloc {
@@ -35,17 +36,26 @@ class LogAnalysisBloc {
 
   Future<String> selectFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
-    String path = result?.files.single.path ?? "";
-    if (path != "") {
-      try {
-        _selectFolderSubject.add(path);
-        var content = await readFile(path);
-        return content;
-      } catch (ex) {
-        _showHintDialogSubject.add("Not support!");
+    if (kIsWeb) {
+      Uint8List? fileBytes = result?.files.first.bytes;
+      String content = new String.fromCharCodes(fileBytes!);
+      withoutFilterContent = content.split("\n");
+      _selectFolderSubject.add("web not supported path");
+      return content;
+    } else {
+      String path = result?.files.single.path ?? "";
+      if (path != "") {
+        try {
+          _selectFolderSubject.add(path);
+          var content = await readFile(path);
+          return content;
+        } catch (ex) {
+          _showHintDialogSubject.add("Not support!");
+        }
       }
+      return "";
+        // NOT running on the web! You can check for additional platforms here.
     }
-    return "";
   }
 
   Future<String> readFile(String path) async {
