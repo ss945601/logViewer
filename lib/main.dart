@@ -59,7 +59,7 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    currentPage = logPage;
+    currentPage = arbPage;
   }
 
   @override
@@ -75,7 +75,7 @@ class _MainPageState extends State<MainPage> {
               currentPage = logPage;
               break;
             default:
-              currentPage = logPage;
+              currentPage = arbPage;
               break;
           }
           return currentPage;

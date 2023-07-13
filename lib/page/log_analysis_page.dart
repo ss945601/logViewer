@@ -11,7 +11,7 @@ class LogAnalysisPage extends StatefulWidget {
 
 class _LogAnalysisPageState extends State<LogAnalysisPage> {
   final LogAnalysisBloc _logAnalysisBloc = LogAnalysisBloc();
-  final qUtil.QuillController _controller = qUtil.QuillController.basic();
+  late qUtil.QuillController _controller = qUtil.QuillController.basic();
   @override
   void initState() {
     // TODO: implement initState
@@ -48,7 +48,8 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
       child: Column(
         children: [
           SelectPathBar(),
-          qUtil.QuillToolbar.basic(controller: _controller),
+          qUtil.QuillToolbar.basic(
+              controller: _controller),
           Expanded(
             child: Container(
               child: qUtil.QuillEditor.basic(
@@ -99,7 +100,13 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
               backgroundColor: Colors.grey,
               foregroundColor: Colors.white),
           onPressed: () {
-            _logAnalysisBloc.selectFile();
+            _logAnalysisBloc.selectFile().then((content) {
+              setState(() {
+                _controller = qUtil.QuillController(
+                    document: qUtil.Document()..insert(0, content),
+                    selection: const TextSelection.collapsed(offset: 0));
+              });
+            });
           },
           label: Text("Open file"))
     ]);
