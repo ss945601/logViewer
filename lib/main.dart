@@ -1,3 +1,4 @@
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:latticework/bloc/app_bloc.dart';
 import 'package:latticework/page/file_browser.dart';
 import 'package:latticework/page/log_analysis_page.dart';
@@ -7,7 +8,7 @@ import 'package:get/get.dart';
 var appBloc = AppBloc();
 
 void main() {
-  runApp( GetMaterialApp(home:  MyApp()));
+  runApp( GetMaterialApp(home:  MyApp(),builder: EasyLoading.init(),));
 }
 
 class MyApp extends StatelessWidget {

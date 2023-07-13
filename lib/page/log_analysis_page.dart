@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_quill/flutter_quill.dart' as qUtil;
 import 'package:latticework/bloc/log_analysis_bloc.dart';
 
@@ -99,11 +100,13 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
               backgroundColor: Colors.grey,
               foregroundColor: Colors.white),
           onPressed: () {
+            EasyLoading.show(status: 'loading...');
             _logAnalysisBloc.selectFile().then((content) {
               setState(() {
                 _controller = qUtil.QuillController(
                     document: qUtil.Document()..insert(0, content),
                     selection: const TextSelection.collapsed(offset: 0));
+                EasyLoading.dismiss();
               });
             });
           },
@@ -172,11 +175,13 @@ class _DialogContentState extends State<DialogContent> {
       DialogContent.textFields.removeAt(index);
     });
   }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Column(
