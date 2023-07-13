@@ -7,7 +7,7 @@ class LogAnalysisBloc {
   final BehaviorSubject<String> _selectFolderSubject =
       BehaviorSubject<String>.seeded("");
 
-  final List<String> printTags = ["[DEBUG]", "[INFO]", "[ERROR]"];
+  final List<String> printTags = [];
   List<String> withoutFilterContent = [];
   Stream<String> get selectFolderStream => _selectFolderSubject.stream;
 
@@ -49,7 +49,7 @@ class LogAnalysisBloc {
       File file = File(path);
       List<String> contents = await file.readAsLines();
       withoutFilterContent = contents;
-      var result = filterString(contents).join("\n");
+      var result = contents.join("\n");
       return result;
     } catch (e) {
       // Handle any errors that occur during file reading.

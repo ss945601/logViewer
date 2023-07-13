@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.arb_flutter">
+    package="com.example.latticework">
    <application
-        android:label="arb_flutter"
+        android:label="latticework"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

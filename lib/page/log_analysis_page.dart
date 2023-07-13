@@ -155,7 +155,7 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
 }
 
 class DialogContent extends StatefulWidget {
-  static List<String> textFields = ["[DEBUG]", "[INFO]", "[ERROR]"];
+  static List<String> textFields = [];
   @override
   _DialogContentState createState() => _DialogContentState();
 }
