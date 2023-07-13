@@ -56,6 +56,7 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
           Divider(),
           Expanded(
             child: Container(
+              padding: EdgeInsets.all(20),
               child: qUtil.QuillEditor.basic(
                 controller: _controller,
                 readOnly: false, // true for view only mode
@@ -145,6 +146,15 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
               _showDialog().then((value) {
                 if (value.length > 0) {
                   var newContent = _logAnalysisBloc.addFilter(value);
+                  setState(() {
+                    _controller = qUtil.QuillController(
+                        document: qUtil.Document()..insert(0, newContent),
+                        selection: const TextSelection.collapsed(offset: 0));
+                    isApplyFilter = true;
+                  });
+                }
+                else{
+                  var newContent = _logAnalysisBloc.originalContent();
                   setState(() {
                     _controller = qUtil.QuillController(
                         document: qUtil.Document()..insert(0, newContent),

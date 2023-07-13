@@ -20,13 +20,13 @@ class MyApp extends StatelessWidget {
         drawer: Drawer(
           child: ListView(
             children: [
-              ListTile(
-                title: Text('Arb Tool'),
-                onTap: () {
-                  appBloc.switchPageSink.add(PageName.arbPage);
-                  Navigator.pop(context);
-                },
-              ),
+              // ListTile(
+              //   title: Text('Arb Tool'),
+              //   onTap: () {
+              //     appBloc.switchPageSink.add(PageName.arbPage);
+              //     Navigator.pop(context);
+              //   },
+              // ),
               ListTile(
                 title: Text('Log Tool'),
                 onTap: () {
@@ -61,7 +61,7 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    currentPage = arbPage;
+    currentPage = logPage;
   }
 
   @override
@@ -77,7 +77,7 @@ class _MainPageState extends State<MainPage> {
               currentPage = logPage;
               break;
             default:
-              currentPage = arbPage;
+              currentPage = logPage;
               break;
           }
           return currentPage;

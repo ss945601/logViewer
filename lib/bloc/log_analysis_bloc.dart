@@ -14,6 +14,10 @@ class LogAnalysisBloc {
   BehaviorSubject<String> _showHintDialogSubject = BehaviorSubject<String>();
   Stream<String> get showHintDialogStream => _showHintDialogSubject.stream;
 
+  String originalContent() {
+    return withoutFilterContent.join("\n");
+  }
+
   String addFilter(List<String> filterStr) {
     print(filterStr);
     var content = [...withoutFilterContent];
@@ -33,11 +37,11 @@ class LogAnalysisBloc {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
     String path = result?.files.single.path ?? "";
     if (path != "") {
-      if (path.split('.').last == "log" || path.split('.').last == "txt") {
+      try {
         _selectFolderSubject.add(path);
         var content = await readFile(path);
         return content;
-      } else {
+      } catch (ex) {
         _showHintDialogSubject.add("Not support!");
       }
     }
