@@ -49,7 +49,9 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
       child: Column(
         children: [
           SelectPathBar(),
+          Divider(),
           qUtil.QuillToolbar.basic(controller: _controller),
+          Divider(),
           Expanded(
             child: Container(
               child: qUtil.QuillEditor.basic(
