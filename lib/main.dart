@@ -7,15 +7,14 @@ import 'package:get/get.dart';
 var appBloc = AppBloc();
 
 void main() {
-  runApp(MyApp());
+  runApp( GetMaterialApp(home:  MyApp()));
 }
 
 class MyApp extends StatelessWidget {
   MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      home: Scaffold(
+    return  Scaffold(
         appBar: AppBar(),
         drawer: Drawer(
           child: ListView(
@@ -24,19 +23,21 @@ class MyApp extends StatelessWidget {
                 title: Text('Arb Tool'),
                 onTap: () {
                   appBloc.switchPageSink.add(PageName.arbPage);
+                  Navigator.pop(context);
                 },
               ),
               ListTile(
                 title: Text('Log Tool'),
                 onTap: () {
                   appBloc.switchPageSink.add(PageName.logPage);
+                  Navigator.pop(context);
                 },
               ),
             ],
           ),
         ),
         body: MainPage(),
-      ),
+      
     );
   }
 }
@@ -82,4 +83,3 @@ class _MainPageState extends State<MainPage> {
         });
   }
 }
-

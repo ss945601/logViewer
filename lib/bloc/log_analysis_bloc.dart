@@ -8,11 +8,26 @@ class LogAnalysisBloc {
       BehaviorSubject<String>.seeded("");
 
   final List<String> printTags = ["[DEBUG]", "[INFO]", "[ERROR]"];
-  String withoutFilterContent = "";
+  List<String> withoutFilterContent = [];
   Stream<String> get selectFolderStream => _selectFolderSubject.stream;
 
   BehaviorSubject<String> _showHintDialogSubject = BehaviorSubject<String>();
   Stream<String> get showHintDialogStream => _showHintDialogSubject.stream;
+
+  String addFilter(List<String> filterStr) {
+    print(filterStr);
+    var content = [...withoutFilterContent];
+    content.removeWhere((line) {
+      for (var filter in filterStr) {
+        if (line.contains(filter)) {
+          return false;
+        }
+      }
+      return true;
+    });
+    var result = content.join("\n");
+    return result;
+  }
 
   Future<String> selectFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
@@ -33,7 +48,7 @@ class LogAnalysisBloc {
     try {
       File file = File(path);
       List<String> contents = await file.readAsLines();
-      withoutFilterContent = contents.join("\n");
+      withoutFilterContent = contents;
       var result = filterString(contents).join("\n");
       return result;
     } catch (e) {
