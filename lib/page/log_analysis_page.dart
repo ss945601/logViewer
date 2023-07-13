@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_quill/flutter_quill.dart' as qUtil;
 import 'package:latticework/bloc/log_analysis_bloc.dart';
+import 'package:badges/badges.dart' as badges;
 
 class LogAnalysisPage extends StatefulWidget {
   const LogAnalysisPage({super.key});
@@ -13,6 +14,7 @@ class LogAnalysisPage extends StatefulWidget {
 class _LogAnalysisPageState extends State<LogAnalysisPage> {
   final LogAnalysisBloc _logAnalysisBloc = LogAnalysisBloc();
   late qUtil.QuillController _controller = qUtil.QuillController.basic();
+  bool isApplyFilter = false;
   @override
   void initState() {
     // TODO: implement initState
@@ -70,7 +72,10 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
       color: Colors.pink.withOpacity(0.1),
       child: Row(
         children: [
-          ToolBar(context),
+          Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: ToolBar(context),
+          ),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -109,29 +114,48 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
                     document: qUtil.Document()..insert(0, content),
                     selection: const TextSelection.collapsed(offset: 0));
                 EasyLoading.dismiss();
+                isApplyFilter = false;
               });
             });
           },
           label: Text("Open file")),
-      TextButton.icon(
-          icon: Icon(Icons.add_box),
-          style: TextButton.styleFrom(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(0),
-              ),
-              backgroundColor: Color.fromARGB(255, 154, 177, 218),
-              foregroundColor: Colors.white),
-          onPressed: () {
-            _showDialog().then((value) {
-              var newContent = _logAnalysisBloc.addFilter(value);
-              setState(() {
-                _controller = qUtil.QuillController(
-                    document: qUtil.Document()..insert(0, newContent),
-                    selection: const TextSelection.collapsed(offset: 0));
+      badges.Badge(
+        badgeAnimation: badges.BadgeAnimation.rotation(
+          animationDuration: Duration(seconds: 2),
+          colorChangeAnimationDuration: Duration(seconds: 2),
+          loopAnimation: false,
+          curve: Curves.fastOutSlowIn,
+          colorChangeAnimationCurve: Curves.easeInCubic,
+        ),
+        badgeStyle: badges.BadgeStyle(
+            badgeColor: isApplyFilter ? Colors.green : Colors.red),
+        badgeContent: Text(
+          DialogContent.textFields.length.toString(),
+          style: TextStyle(color: Colors.white),
+        ),
+        child: TextButton.icon(
+            icon: Icon(Icons.add_box),
+            style: TextButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(0),
+                ),
+                backgroundColor: Color.fromARGB(255, 154, 177, 218),
+                foregroundColor: Colors.white),
+            onPressed: () {
+              _showDialog().then((value) {
+                if (value.length > 0) {
+                  var newContent = _logAnalysisBloc.addFilter(value);
+                  setState(() {
+                    _controller = qUtil.QuillController(
+                        document: qUtil.Document()..insert(0, newContent),
+                        selection: const TextSelection.collapsed(offset: 0));
+                    isApplyFilter = true;
+                  });
+                }
               });
-            });
-          },
-          label: Text("Add filters"))
+            },
+            label: Text("Find filters")),
+      )
     ]);
   }
 
@@ -147,6 +171,7 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
             TextButton(
               child: Text('Apply'),
               onPressed: () {
+                DialogContent.textFields.removeWhere((element) => element == "");
                 // Handle the apply action here
                 Navigator.of(context).pop();
               },
@@ -202,12 +227,14 @@ class _DialogContentState extends State<DialogContent> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            TextButton(
-              child: Text('Add Text Field'),
+            IconButton(
+              splashRadius: 20,
+              icon: Icon(Icons.add),
               onPressed: addTextField,
             ),
-            TextButton(
-              child: Text('Remove Text Field'),
+            IconButton(
+              splashRadius: 20,
+              icon: Icon(Icons.remove),
               onPressed: DialogContent.textFields.isNotEmpty
                   ? () => removeTextField(DialogContent.textFields.length - 1)
                   : null,
