@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -38,7 +39,7 @@ class LogAnalysisBloc {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
     if (kIsWeb) {
       Uint8List? fileBytes = result?.files.first.bytes;
-      String content = new String.fromCharCodes(fileBytes!);
+      String content = Utf8Decoder().convert(fileBytes!);
       withoutFilterContent = content.split("\n");
       _selectFolderSubject.add("web not supported path");
       return content;
@@ -54,7 +55,7 @@ class LogAnalysisBloc {
         }
       }
       return "";
-        // NOT running on the web! You can check for additional platforms here.
+      // NOT running on the web! You can check for additional platforms here.
     }
   }
 
