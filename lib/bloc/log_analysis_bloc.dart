@@ -15,18 +15,30 @@ class LogAnalysisBloc {
 
   BehaviorSubject<String> _showHintDialogSubject = BehaviorSubject<String>();
   Stream<String> get showHintDialogStream => _showHintDialogSubject.stream;
+  bool isFilterMode = false;
 
   String originalContent() {
     return withoutFilterContent.join("\n");
   }
 
-  String addFilter(List<String> filterStr) {
+  String addFilter(List<String> filterStr, String currentString,
+      {bool caseIgnore = false}) {
     print(filterStr);
+    if (!isFilterMode) {
+      withoutFilterContent = currentString.split("\n");
+    }
+    isFilterMode = filterStr.length > 0 ? true : false;
     var content = [...withoutFilterContent];
     content.removeWhere((line) {
       for (var filter in filterStr) {
-        if (line.contains(filter)) {
-          return false;
+        if (!caseIgnore) {
+          if (line.contains(filter)) {
+            return false;
+          }
+        } else {
+          if (line.toLowerCase().contains(filter.toLowerCase())) {
+            return false;
+          }
         }
       }
       return true;

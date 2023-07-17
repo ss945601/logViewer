@@ -14,6 +14,7 @@ class LogAnalysisPage extends StatefulWidget {
 class _LogAnalysisPageState extends State<LogAnalysisPage> {
   final LogAnalysisBloc _logAnalysisBloc = LogAnalysisBloc();
   late qUtil.QuillController _controller = qUtil.QuillController.basic();
+  bool isReadOnly = false;
   bool isApplyFilter = false;
   @override
   void initState() {
@@ -56,10 +57,11 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
           Divider(),
           Expanded(
             child: Container(
+              color:isReadOnly?Colors.grey.withOpacity(0.1) : Colors.white,
               padding: EdgeInsets.all(20),
               child: qUtil.QuillEditor.basic(
                 controller: _controller,
-                readOnly: false, // true for view only mode
+                readOnly: isReadOnly, // true for view only mode
               ),
             ),
           )
@@ -134,7 +136,7 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
         badgeStyle: badges.BadgeStyle(
             badgeColor: isApplyFilter ? Colors.green : Colors.red),
         badgeContent: Text(
-          DialogContent.textFields.length.toString(),
+          FilterContent.filterItems.length.toString(),
           style: TextStyle(color: Colors.white),
         ),
         child: TextButton.icon(
@@ -146,14 +148,17 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
                 backgroundColor: Color.fromARGB(255, 154, 177, 218),
                 foregroundColor: Colors.white),
             onPressed: () {
-              _showDialog().then((value) {
+              _showFilterDialog().then((value) {
                 if (value.length > 0) {
-                  var newContent = _logAnalysisBloc.addFilter(value);
+                  var newContent = _logAnalysisBloc.addFilter(
+                      value, _controller.plainTextEditingValue.text,
+                      caseIgnore: FilterContent.caseIgnore);
                   setState(() {
                     _controller = qUtil.QuillController(
                         document: qUtil.Document()..insert(0, newContent),
                         selection: const TextSelection.collapsed(offset: 0));
                     isApplyFilter = true;
+                    isReadOnly = true;
                   });
                 } else {
                   var newContent = _logAnalysisBloc.originalContent();
@@ -162,6 +167,8 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
                         document: qUtil.Document()..insert(0, newContent),
                         selection: const TextSelection.collapsed(offset: 0));
                     isApplyFilter = true;
+                    _logAnalysisBloc.isFilterMode = false;
+                    isReadOnly = false;
                   });
                 }
               });
@@ -171,48 +178,66 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
     ]);
   }
 
-  Future<List<String>> _showDialog() async {
-    var content = DialogContent();
+  Future<List<String>> _showFilterDialog() async {
+    var content = FilterContent();
     await showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Add filters'),
-          content: content,
-          actions: <Widget>[
-            TextButton(
-              child: Text('Apply'),
-              onPressed: () {
-                DialogContent.textFields
-                    .removeWhere((element) => element == "");
-                // Handle the apply action here
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
+        return StatefulBuilder(builder: (context, setState) {
+          return AlertDialog(
+            title: Text('Add filters'),
+            content: content,
+            actions: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Case ignore"),
+                  Checkbox(
+                    value: FilterContent.caseIgnore,
+                    onChanged: (value) {
+                      setState(() {
+                        FilterContent.caseIgnore = value!;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              TextButton(
+                child: Text('Apply'),
+                onPressed: () {
+                  FilterContent.filterItems
+                      .removeWhere((element) => element == "");
+                  // Handle the apply action here
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
       },
     );
-    return DialogContent.textFields;
+    return FilterContent.filterItems;
   }
 }
 
-class DialogContent extends StatefulWidget {
-  static List<String> textFields = [];
+class FilterContent extends StatefulWidget {
+  static List<String> filterItems = [];
+  static bool caseIgnore = false;
+
   @override
-  _DialogContentState createState() => _DialogContentState();
+  _FilterContentState createState() => _FilterContentState();
 }
 
-class _DialogContentState extends State<DialogContent> {
+class _FilterContentState extends State<FilterContent> {
   void addTextField() {
     setState(() {
-      DialogContent.textFields.add('');
+      FilterContent.filterItems.add('');
     });
   }
 
   void removeTextField(int index) {
     setState(() {
-      DialogContent.textFields.removeAt(index);
+      FilterContent.filterItems.removeAt(index);
     });
   }
 
@@ -227,12 +252,12 @@ class _DialogContentState extends State<DialogContent> {
     return Column(
       children: [
         // Display existing text fields
-        for (int i = 0; i < DialogContent.textFields.length; i++)
+        for (int i = 0; i < FilterContent.filterItems.length; i++)
           TextFormField(
-            initialValue: DialogContent.textFields[i],
+            initialValue: FilterContent.filterItems[i],
             onChanged: (value) {
               setState(() {
-                DialogContent.textFields[i] = value;
+                FilterContent.filterItems[i] = value;
               });
             },
           ),
@@ -248,8 +273,8 @@ class _DialogContentState extends State<DialogContent> {
             IconButton(
               splashRadius: 20,
               icon: Icon(Icons.remove),
-              onPressed: DialogContent.textFields.isNotEmpty
-                  ? () => removeTextField(DialogContent.textFields.length - 1)
+              onPressed: FilterContent.filterItems.isNotEmpty
+                  ? () => removeTextField(FilterContent.filterItems.length - 1)
                   : null,
             ),
           ],
