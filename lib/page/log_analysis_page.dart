@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_quill/flutter_quill.dart' as qUtil;
+import 'package:latticework/bloc/app_bloc.dart';
 import 'package:latticework/bloc/log_analysis_bloc.dart';
 import 'package:badges/badges.dart' as badges;
 
@@ -57,7 +58,7 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
           Divider(),
           Expanded(
             child: Container(
-              color:isReadOnly?Colors.grey.withOpacity(0.1) : Colors.white,
+              color: isReadOnly ? Colors.grey.withOpacity(0.1) : Colors.white,
               padding: EdgeInsets.all(20),
               child: qUtil.QuillEditor.basic(
                 controller: _controller,
@@ -125,6 +126,25 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
             });
           },
           label: Text("Open file")),
+      TextButton.icon(
+          icon: Icon(Icons.open_in_browser),
+          style: TextButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(0),
+              ),
+              backgroundColor: Color.fromARGB(255, 92, 158, 94),
+              foregroundColor: Colors.white),
+          onPressed: () {
+            EasyLoading.show(status: 'loading...');
+            setState(() {
+              appBloc
+                  .saveFile(_controller.plainTextEditingValue.text, context)
+                  .then((value) {
+                EasyLoading.dismiss();
+              });
+            });
+          },
+          label: Text("Save file")),
       badges.Badge(
         badgeAnimation: badges.BadgeAnimation.rotation(
           animationDuration: Duration(seconds: 2),

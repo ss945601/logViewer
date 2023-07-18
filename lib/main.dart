@@ -5,7 +5,6 @@ import 'package:latticework/page/log_analysis_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-var appBloc = AppBloc();
 
 void main() {
   runApp( GetMaterialApp(home:  MyApp(),builder: EasyLoading.init(),));
