@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:latticework/bloc/app_bloc.dart';
 import 'package:latticework/page/file_browser.dart';
@@ -5,39 +6,41 @@ import 'package:latticework/page/log_analysis_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-
 void main() {
-  runApp( GetMaterialApp(home:  MyApp(),builder: EasyLoading.init(),));
+  runApp(GetMaterialApp(
+    home: MyApp(),
+    builder: EasyLoading.init(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
   MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-        appBar: AppBar(),
-        drawer: Drawer(
-          child: ListView(
-            children: [
-              // ListTile(
-              //   title: Text('Arb Tool'),
-              //   onTap: () {
-              //     appBloc.switchPageSink.add(PageName.arbPage);
-              //     Navigator.pop(context);
-              //   },
-              // ),
+    return Scaffold(
+      appBar: AppBar(),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            ListTile(
+              title: Text('Log Tool'),
+              onTap: () {
+                appBloc.switchPageSink.add(PageName.logPage);
+                Navigator.pop(context);
+              },
+            ),
+            if(!kIsWeb) 
               ListTile(
-                title: Text('Log Tool'),
+                title: Text('Arb Tool'),
                 onTap: () {
-                  appBloc.switchPageSink.add(PageName.logPage);
+                  appBloc.switchPageSink.add(PageName.arbPage);
                   Navigator.pop(context);
                 },
               ),
-            ],
-          ),
+          ],
         ),
-        body: MainPage(),
-      
+      ),
+      body: MainPage(),
     );
   }
 }
