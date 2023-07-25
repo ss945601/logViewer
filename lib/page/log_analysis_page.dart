@@ -169,8 +169,8 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
             EasyLoading.show(status: 'loading...');
             _logAnalysisBloc.selectFile().then((content) {
               setState(() {
-                _controller.document..delete(0, _controller.document.length);
-                _controller.document..insert(0, content);
+                _controller.document.delete(0, _controller.document.length);
+                _controller.document.insert(0, content);
                 EasyLoading.dismiss();
                 isApplyFilter = false;
                 resetLineCount();
@@ -253,8 +253,8 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
                       caseIgnore: FilterContent.caseIgnore);
                   setState(() {
                     _controller.document
-                      ..delete(0, _controller.document.length);
-                    _controller.document..insert(0, newContent);
+                      .delete(0, _controller.document.length);
+                    _controller.document.insert(0, newContent);
                     isApplyFilter = true;
                     isReadOnly = true;
                     resetLineCount();
@@ -263,8 +263,8 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
                   var newContent = _logAnalysisBloc.originalContent();
                   setState(() {
                     _controller.document
-                      ..delete(0, _controller.document.length);
-                    _controller.document..insert(0, newContent);
+                      .delete(0, _controller.document.length);
+                    _controller.document.insert(0, newContent);
                     isApplyFilter = true;
                     _logAnalysisBloc.isFilterMode = false;
                     isReadOnly = false;
