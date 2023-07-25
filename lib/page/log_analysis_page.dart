@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -18,10 +20,17 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
   late qUtil.QuillController _controller = qUtil.QuillController.basic();
   bool isReadOnly = false;
   bool isApplyFilter = false;
+  StreamController<String> lineCtr = StreamController();
+  final ScrollController lineCountScrollCtr = ScrollController();
   @override
   void initState() {
     // TODO: implement initState
+    lineCtr.add("1.");
     super.initState();
+    _controller.document.changes.listen((event) {
+      resetLineCount();
+    });
+
     _logAnalysisBloc.showHintDialogStream.listen((msg) {
       showDialog(
           context: context,
@@ -48,6 +57,15 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
     });
   }
 
+  void resetLineCount() {
+    var lineNum = _controller.plainTextEditingValue.text.split("\n").length;
+    var lineStr = "";
+    for (var i = 1; i < lineNum; i++) {
+      lineStr = lineStr + i.toString() + ".\n";
+    }
+    lineCtr.add(lineStr);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -58,13 +76,49 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
           qUtil.QuillToolbar.basic(controller: _controller),
           Divider(),
           Expanded(
-            child: Container(
-              color: isReadOnly ? Colors.grey.withOpacity(0.1) : Colors.white,
-              padding: EdgeInsets.all(20),
-              child: qUtil.QuillEditor.basic(
-                controller: _controller,
-                readOnly: isReadOnly, // true for view only mode
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Container(
+                    padding: EdgeInsets.only(top: 20,left: 5,right: 5),
+                    color: Colors.amber.withAlpha(50),
+                    child: StreamBuilder<Object>(
+                        stream: lineCtr.stream,
+                        builder: (context, snapshot) {
+                          return ScrollConfiguration(
+                            behavior: ScrollConfiguration.of(context)
+                                .copyWith(scrollbars: false),
+                            child: SingleChildScrollView(
+                              controller: lineCountScrollCtr,
+                              physics: NeverScrollableScrollPhysics(),
+                              child: Text("${snapshot.data}",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(height: 1.19,fontSize: 18, color: Color.fromARGB(255, 139, 65, 61))),
+                            ),
+                          );
+                        })),
+                Expanded(
+                  child: Container(
+                      color: isReadOnly
+                          ? Colors.grey.withOpacity(0.1)
+                          : Colors.white,
+                      padding: EdgeInsets.all(20),
+                      child: NotificationListener<ScrollUpdateNotification>(
+                        onNotification:
+                            (ScrollUpdateNotification notification) {
+                          lineCountScrollCtr.jumpTo(
+                              lineCountScrollCtr.position.pixels +
+                                  notification.scrollDelta!);
+                          return true;
+                        },
+                        child: qUtil.QuillEditor.basic(
+                          controller: _controller,
+                          readOnly: isReadOnly, // true for view only mode
+                        ),
+                      )),
+                ),
+              ],
             ),
           )
         ],
@@ -115,11 +169,11 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
             EasyLoading.show(status: 'loading...');
             _logAnalysisBloc.selectFile().then((content) {
               setState(() {
-                _controller = qUtil.QuillController(
-                    document: qUtil.Document()..insert(0, content),
-                    selection: const TextSelection.collapsed(offset: 0));
+                _controller.document..delete(0, _controller.document.length);
+                _controller.document..insert(0, content);
                 EasyLoading.dismiss();
                 isApplyFilter = false;
+                resetLineCount();
               });
             }).onError((error, stackTrace) {
               EasyLoading.dismiss();
@@ -159,7 +213,9 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
             onPressed: () {
               EasyLoading.show(status: 'loading...');
               setState(() {
-                _logAnalysisBloc.askAI(_controller.plainTextEditingValue.text).then((res) {
+                _logAnalysisBloc
+                    .askAI(_controller.plainTextEditingValue.text)
+                    .then((res) {
                   print(res);
                   EasyLoading.dismiss();
                 });
@@ -196,21 +252,23 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
                       value, _controller.plainTextEditingValue.text,
                       caseIgnore: FilterContent.caseIgnore);
                   setState(() {
-                    _controller = qUtil.QuillController(
-                        document: qUtil.Document()..insert(0, newContent),
-                        selection: const TextSelection.collapsed(offset: 0));
+                    _controller.document
+                      ..delete(0, _controller.document.length);
+                    _controller.document..insert(0, newContent);
                     isApplyFilter = true;
                     isReadOnly = true;
+                    resetLineCount();
                   });
                 } else {
                   var newContent = _logAnalysisBloc.originalContent();
                   setState(() {
-                    _controller = qUtil.QuillController(
-                        document: qUtil.Document()..insert(0, newContent),
-                        selection: const TextSelection.collapsed(offset: 0));
+                    _controller.document
+                      ..delete(0, _controller.document.length);
+                    _controller.document..insert(0, newContent);
                     isApplyFilter = true;
                     _logAnalysisBloc.isFilterMode = false;
                     isReadOnly = false;
+                    resetLineCount();
                   });
                 }
               });
