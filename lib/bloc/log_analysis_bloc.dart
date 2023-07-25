@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/subjects.dart';
@@ -15,8 +16,13 @@ class LogAnalysisBloc {
 
   BehaviorSubject<String> _showHintDialogSubject = BehaviorSubject<String>();
   Stream<String> get showHintDialogStream => _showHintDialogSubject.stream;
-  bool isFilterMode = false;
+  final OpenAI _openAI = OpenAI.instance.build(
+        token: "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",
+        baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 5)),
+        enableLog: true);
 
+  bool isFilterMode = false;
+  
   String originalContent() {
     return withoutFilterContent.join("\n");
   }
@@ -93,5 +99,17 @@ class LogAnalysisBloc {
       return true;
     });
     return contents;
+  }
+
+  Future<String> askAI(String req) async {
+    final request = CompleteText(prompt:req,
+                model: TextDavinci3Model(), maxTokens: 100);
+
+    final response = await _openAI.onCompletion(request:request);
+    String content = "";
+    for (var element in response!.choices) {
+      content += element.text;
+    }
+    return content;
   }
 }

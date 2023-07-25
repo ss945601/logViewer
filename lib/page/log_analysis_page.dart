@@ -1,3 +1,4 @@
+import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_quill/flutter_quill.dart' as qUtil;
@@ -145,6 +146,27 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
             });
           },
           label: Text("Save file")),
+      Visibility(
+        visible: false,
+        child: TextButton.icon(
+            icon: Icon(Icons.open_in_browser),
+            style: TextButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(0),
+                ),
+                backgroundColor: Color.fromARGB(255, 201, 169, 114),
+                foregroundColor: Colors.white),
+            onPressed: () {
+              EasyLoading.show(status: 'loading...');
+              setState(() {
+                _logAnalysisBloc.askAI(_controller.plainTextEditingValue.text).then((res) {
+                  print(res);
+                  EasyLoading.dismiss();
+                });
+              });
+            },
+            label: Text("Ask chatGPT")),
+      ),
       badges.Badge(
         badgeAnimation: badges.BadgeAnimation.rotation(
           animationDuration: Duration(seconds: 2),

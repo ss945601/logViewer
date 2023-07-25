@@ -30,6 +30,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   badges: ^3.1.1
+  chat_gpt_sdk: ^2.2.3
   csv: ^5.0.2
   cupertino_icons: ^1.0.2
   file_picker: ^5.3.2
