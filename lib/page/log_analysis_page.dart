@@ -81,7 +81,7 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Container(
-                    padding: EdgeInsets.only(top: 20,left: 5,right: 5),
+                    padding: EdgeInsets.only(top: 21, left: 5, right: 5),
                     color: Colors.amber.withAlpha(50),
                     child: StreamBuilder<Object>(
                         stream: lineCtr.stream,
@@ -94,7 +94,10 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
                               physics: NeverScrollableScrollPhysics(),
                               child: Text("${snapshot.data}",
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(height: 1.19,fontSize: 18, color: Color.fromARGB(255, 139, 65, 61))),
+                                  style: TextStyle(
+                                      height: 1.19,
+                                      fontSize: 18,
+                                      color: Color.fromARGB(255, 139, 65, 61))),
                             ),
                           );
                         })),
@@ -251,20 +254,24 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
                   var newContent = _logAnalysisBloc.addFilter(
                       value, _controller.plainTextEditingValue.text,
                       caseIgnore: FilterContent.caseIgnore);
+                  _controller.document.close();
+                  _controller.document = qUtil.Document()
+                    ..insert(0, newContent);
                   setState(() {
-                    _controller.document
-                      .delete(0, _controller.document.length);
-                    _controller.document.insert(0, newContent);
                     isApplyFilter = true;
                     isReadOnly = true;
                     resetLineCount();
                   });
                 } else {
                   var newContent = _logAnalysisBloc.originalContent();
+                  _controller.document.delete(0, _controller.document.length);
+                  _controller.document.insert(
+                      0, newContent.substring(0, newContent.length - 1));
+                  _controller.document.changes.listen((event) {
+                    resetLineCount();
+                  });
+
                   setState(() {
-                    _controller.document
-                      .delete(0, _controller.document.length);
-                    _controller.document.insert(0, newContent);
                     isApplyFilter = true;
                     _logAnalysisBloc.isFilterMode = false;
                     isReadOnly = false;
