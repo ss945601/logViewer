@@ -4,6 +4,7 @@ import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_quill/flutter_quill.dart' as qUtil;
+import 'package:get/get.dart';
 import 'package:latticework/bloc/app_bloc.dart';
 import 'package:latticework/bloc/log_analysis_bloc.dart';
 import 'package:badges/badges.dart' as badges;
@@ -285,40 +286,42 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
     ]);
   }
 
-  Future<List<String>> _showFilterDialog() async {
+  Future<List<List<String>>> _showFilterDialog() async {
     var content = FilterContent();
     await showDialog(
       context: context,
       builder: (BuildContext context) {
         return StatefulBuilder(builder: (context, setState) {
-          return AlertDialog(
-            title: Text('Add filters'),
-            content: content,
-            actions: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Case ignore"),
-                  Checkbox(
-                    value: FilterContent.caseIgnore,
-                    onChanged: (value) {
-                      setState(() {
-                        FilterContent.caseIgnore = value!;
-                      });
-                    },
-                  ),
-                ],
-              ),
-              TextButton(
-                child: Text('Apply'),
-                onPressed: () {
-                  FilterContent.filterItems
-                      .removeWhere((element) => element == "");
-                  // Handle the apply action here
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
+          return SizedBox(
+            child: AlertDialog(
+              title: Text('Add filters'),
+              content: Container(width: Get.width/2, child: content),
+              actions: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Case ignore"),
+                    Checkbox(
+                      value: FilterContent.caseIgnore,
+                      onChanged: (value) {
+                        setState(() {
+                          FilterContent.caseIgnore = value!;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                TextButton(
+                  child: Text('Apply'),
+                  onPressed: () {
+                    FilterContent.filterItems
+                        .removeWhere((element) => element == "");
+                    // Handle the apply action here
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
           );
         });
       },
@@ -328,7 +331,7 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
 }
 
 class FilterContent extends StatefulWidget {
-  static List<String> filterItems = [];
+  static List<List<String>> filterItems = [];
   static bool caseIgnore = false;
 
   @override
@@ -338,7 +341,8 @@ class FilterContent extends StatefulWidget {
 class _FilterContentState extends State<FilterContent> {
   void addTextField() {
     setState(() {
-      FilterContent.filterItems.add('');
+      FilterContent.filterItems.add([]);
+      FilterContent.filterItems.last.add("");
     });
   }
 
@@ -360,13 +364,62 @@ class _FilterContentState extends State<FilterContent> {
       children: [
         // Display existing text fields
         for (int i = 0; i < FilterContent.filterItems.length; i++)
-          TextFormField(
-            initialValue: FilterContent.filterItems[i],
-            onChanged: (value) {
-              setState(() {
-                FilterContent.filterItems[i] = value;
-              });
-            },
+          Column(
+            children: [
+              Row(
+                children: [
+                  for (int j = 0; j < FilterContent.filterItems[i].length; j++)
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 2),
+                              child: TextFormField(
+                                textAlign: TextAlign.center,
+                                initialValue: FilterContent.filterItems[i][j],
+                                onChanged: (value) {
+                                  setState(() {
+                                    FilterContent.filterItems[i][j] = value;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                          if (j != FilterContent.filterItems[i].length - 1)
+                            Text("&")
+                        ],
+                      ),
+                    ),
+                  if (FilterContent.filterItems[i].length == 0) Spacer(),
+                  Column(
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            FilterContent.filterItems[i].add("");
+                          });
+                        },
+                        icon: Icon(Icons.add),
+                        iconSize: 15,
+                        splashRadius: 3,
+                        color: Colors.green,
+                      ),
+                      IconButton(
+                          onPressed: () {
+                            FilterContent.filterItems[i].removeLast();
+                          },
+                          icon: Icon(Icons.remove),
+                          iconSize: 15,
+                          splashRadius: 3,
+                          color: Colors.red),
+                    ],
+                  )
+                ],
+              ),
+              if (i != FilterContent.filterItems.length-1)
+                Text("or",style: TextStyle(fontSize: 20),)
+            ],
           ),
         SizedBox(height: 10),
         Row(

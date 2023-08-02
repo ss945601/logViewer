@@ -17,17 +17,17 @@ class LogAnalysisBloc {
   BehaviorSubject<String> _showHintDialogSubject = BehaviorSubject<String>();
   Stream<String> get showHintDialogStream => _showHintDialogSubject.stream;
   final OpenAI _openAI = OpenAI.instance.build(
-        token: "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",
-        baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 5)),
-        enableLog: true);
+      token: "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",
+      baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 5)),
+      enableLog: true);
 
   bool isFilterMode = false;
-  
+
   String originalContent() {
     return withoutFilterContent.join("\n");
   }
 
-  String addFilter(List<String> filterStr, String currentString,
+  String addFilter(List<List<String>> filterStr, String currentString,
       {bool caseIgnore = false}) {
     print(filterStr);
     if (!isFilterMode) {
@@ -36,16 +36,24 @@ class LogAnalysisBloc {
     isFilterMode = filterStr.length > 0 ? true : false;
     var content = [...withoutFilterContent];
     content.removeWhere((line) {
-      for (var filter in filterStr) {
-        if (!caseIgnore) {
-          if (line.contains(filter)) {
-            return false;
-          }
-        } else {
-          if (line.toLowerCase().contains(filter.toLowerCase())) {
-            return false;
+      var collectNeedRemove = [];
+      for (var filterAnd in filterStr) {
+        var isNeedRemove = false;
+        for (var filter in filterAnd) {
+          if (!caseIgnore) {
+            if (!line.contains(filter)) {
+              isNeedRemove = true;
+            }
+          } else {
+            if (!line.toLowerCase().contains(filter.toLowerCase())) {
+              isNeedRemove = true;
+            }
           }
         }
+        collectNeedRemove.add(isNeedRemove);
+      }
+      for (var ret in collectNeedRemove) {
+        if (!ret) return false;
       }
       return true;
     });
@@ -102,10 +110,10 @@ class LogAnalysisBloc {
   }
 
   Future<String> askAI(String req) async {
-    final request = CompleteText(prompt:req,
-                model: TextDavinci3Model(), maxTokens: 100);
+    final request =
+        CompleteText(prompt: req, model: TextDavinci3Model(), maxTokens: 100);
 
-    final response = await _openAI.onCompletion(request:request);
+    final response = await _openAI.onCompletion(request: request);
     String content = "";
     for (var element in response!.choices) {
       content += element.text;
