@@ -245,66 +245,69 @@ class _FileBrowserPageState extends State<FileBrowserPage> {
             ? currentIdx + shift
             : langs.keys.toList().length);
     columnKeys = langs.values.first.keys.toList();
-    return LayoutBuilder(
-        builder: (context, constraints) {
-        return Container(
-          width: Get.width,
-          height: Get.height,
+    return LayoutBuilder(builder: (context, constraints) {
+      var rowCount = 0;
+      return Container(
+        width: Get.width,
+        height: Get.height,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
           child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: DataTable(
-                columnSpacing: 0,
-                columns: [
-                  DataColumn(label: Text('')),
-                  ...columnKeys.map((columnKey) {
-                    return DataColumn(label: Text(columnKey));
-                  }).toList(),
-                ],
-                rows: rowKeys.toList().map((rowKey) {
-                  return DataRow(
-                    cells: [
-                      DataCell(SizedBox(width: 250, child: Text(rowKey))),
-                      ...columnKeys.map((columnKey) {
-                        return DataCell(
-                          Container(
-                            width: Get.width / (columnKeys.length),
-                            child: InkWell(
-                              onTap: () {},
-                              onHover: (value) {
-                                if (value) {
-                                  _fileBrowserBloc.setHint(columnKey +
-                                      " | " +
-                                      rowKey +
-                                      " : " +
-                                      langs[rowKey]![columnKey]!);
-                                } else {
-                                  _fileBrowserBloc.setHint("");
-                                }
-                              },
-                              child: TextFormField(
-                                decoration: InputDecoration(
-                                  hintText: columnKey,
-                                ),
-                                key: UniqueKey(),
-                                initialValue: langs[rowKey]![columnKey],
-                                onChanged: (newValue) => updateCellValue(
-                                    langs, rowKey, columnKey, newValue),
+            scrollDirection: Axis.vertical,
+            child: DataTable(
+              columnSpacing: 0,
+              columns: [
+                DataColumn(label: Text('')),
+                ...columnKeys.map((columnKey) {
+                  return DataColumn(label: Text(columnKey));
+                }).toList(),
+              ],
+              rows: rowKeys.toList().map((rowKey) {
+                return DataRow(
+                  cells: [
+                    DataCell(SizedBox(width: 250, child: Text(rowKey))),
+                    ...columnKeys.map((columnKey) {
+                      rowCount += 1;
+                      return DataCell(
+                        Container(
+                          color: rowCount % 2 == 1
+                              ? Color.fromARGB(255, 207, 221, 227)
+                              : Color.fromARGB(255, 235, 221, 221),
+                          width: Get.width / (columnKeys.length),
+                          child: InkWell(
+                            onTap: () {},
+                            onHover: (value) {
+                              if (value) {
+                                _fileBrowserBloc.setHint(columnKey +
+                                    " | " +
+                                    rowKey +
+                                    " : " +
+                                    langs[rowKey]![columnKey]!);
+                              } else {
+                                _fileBrowserBloc.setHint("");
+                              }
+                            },
+                            child: TextFormField(
+                              decoration: InputDecoration(
+                                hintText: columnKey,
                               ),
+                              key: UniqueKey(),
+                              initialValue: langs[rowKey]![columnKey],
+                              onChanged: (newValue) => updateCellValue(
+                                  langs, rowKey, columnKey, newValue),
                             ),
                           ),
-                        );
-                      }).toList(),
-                    ],
-                  );
-                }).toList(),
-              ),
+                        ),
+                      );
+                    }).toList(),
+                  ],
+                );
+              }).toList(),
             ),
           ),
-        );
-      }
-    );
+        ),
+      );
+    });
   }
 }
 
