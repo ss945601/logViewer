@@ -40,45 +40,35 @@ class _FileBrowserPageState extends State<FileBrowserPage> {
               children: [
                 SelectPathBar(path),
                 TableView(),
-                Spacer(),
                 HintSection(),
-                Spacer(),
                 if (dataSize > 0) PageNumButton(),
-                Spacer(),
+                SizedBox(height: 12),
               ],
             ),
           );
         });
   }
 
-  Expanded PageNumButton() {
-    return Expanded(
-      flex: 2,
-      child: Wrap(
-        alignment: WrapAlignment.center,
-        children: [
-          SizedBox(
-            width: 10,
-          ),
-          for (var i = 0; i < dataSize / shift; i++)
-            Expanded(
-              child: TextButton(
-                  style: currentIdx == i * shift
-                      ? TextButton.styleFrom(
-                          backgroundColor: Colors.blueAccent.withAlpha(50))
-                      : TextButton.styleFrom(),
-                  onPressed: () {
-                    setState(() {
-                      currentIdx = i * shift;
-                    });
-                  },
-                  child: Text((i + 1).toString())),
-            ),
-          SizedBox(
-            width: 10,
-          ),
-        ],
-      ),
+  Wrap PageNumButton() {
+    return Wrap(
+      alignment: WrapAlignment.center,
+      children: [
+        for (var i = 0; i < dataSize / shift; i++)
+          TextButton(
+              style: currentIdx == i * shift
+                  ? TextButton.styleFrom(
+                      backgroundColor: Colors.blueAccent.withAlpha(50))
+                  : TextButton.styleFrom(),
+              onPressed: () {
+                setState(() {
+                  currentIdx = i * shift;
+                });
+              },
+              child: Text((i + 1).toString())),
+        SizedBox(
+          width: 10,
+        ),
+      ],
     );
   }
 
@@ -158,6 +148,7 @@ class _FileBrowserPageState extends State<FileBrowserPage> {
 
   Expanded HintSection() {
     return Expanded(
+      flex: 2,
       child: IntrinsicWidth(
         child: Container(
           alignment: Alignment.center,
@@ -206,7 +197,7 @@ class _FileBrowserPageState extends State<FileBrowserPage> {
             builder: (context, arbJsonSnapshot) {
               if (arbJsonSnapshot.data != null &&
                   arbJsonSnapshot.data!.isNotEmpty) {
-                return I10nTable(arbJsonSnapshot.data!);
+                return Center(child: I10nTable(arbJsonSnapshot.data!));
               } else {
                 return SizedBox.shrink();
               }
@@ -245,7 +236,7 @@ class _FileBrowserPageState extends State<FileBrowserPage> {
     _fileBrowserBloc.update(tmpLang);
   }
 
-  Container I10nTable(Map<String, Map<String, String>> langs) {
+  LayoutBuilder I10nTable(Map<String, Map<String, String>> langs) {
     List<String> rowKeys = [];
     List<String> columnKeys = [];
     rowKeys = langs.keys.toList().sublist(
@@ -254,61 +245,65 @@ class _FileBrowserPageState extends State<FileBrowserPage> {
             ? currentIdx + shift
             : langs.keys.toList().length);
     columnKeys = langs.values.first.keys.toList();
-    return Container(
-      width: Get.width,
-      height: Get.height,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: DataTable(
-            columnSpacing: 0,
-            columns: [
-              DataColumn(label: Text('')),
-              ...columnKeys.map((columnKey) {
-                return DataColumn(label: Text(columnKey));
-              }).toList(),
-            ],
-            rows: rowKeys.toList().map((rowKey) {
-              return DataRow(
-                cells: [
-                  DataCell(SizedBox(width: 250, child: Text(rowKey))),
+    return LayoutBuilder(
+        builder: (context, constraints) {
+        return Container(
+          width: Get.width,
+          height: Get.height,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: DataTable(
+                columnSpacing: 0,
+                columns: [
+                  DataColumn(label: Text('')),
                   ...columnKeys.map((columnKey) {
-                    return DataCell(
-                      Container(
-                        width: Get.width / (columnKeys.length),
-                        child: InkWell(
-                          onTap: () {},
-                          onHover: (value) {
-                            if (value) {
-                              _fileBrowserBloc.setHint(columnKey +
-                                  " | " +
-                                  rowKey +
-                                  " : " +
-                                  langs[rowKey]![columnKey]!);
-                            } else {
-                              _fileBrowserBloc.setHint("");
-                            }
-                          },
-                          child: TextFormField(
-                            decoration: InputDecoration(
-                              hintText: columnKey,
-                            ),
-                            key: UniqueKey(),
-                            initialValue: langs[rowKey]![columnKey],
-                            onChanged: (newValue) => updateCellValue(
-                                langs, rowKey, columnKey, newValue),
-                          ),
-                        ),
-                      ),
-                    );
+                    return DataColumn(label: Text(columnKey));
                   }).toList(),
                 ],
-              );
-            }).toList(),
+                rows: rowKeys.toList().map((rowKey) {
+                  return DataRow(
+                    cells: [
+                      DataCell(SizedBox(width: 250, child: Text(rowKey))),
+                      ...columnKeys.map((columnKey) {
+                        return DataCell(
+                          Container(
+                            width: Get.width / (columnKeys.length),
+                            child: InkWell(
+                              onTap: () {},
+                              onHover: (value) {
+                                if (value) {
+                                  _fileBrowserBloc.setHint(columnKey +
+                                      " | " +
+                                      rowKey +
+                                      " : " +
+                                      langs[rowKey]![columnKey]!);
+                                } else {
+                                  _fileBrowserBloc.setHint("");
+                                }
+                              },
+                              child: TextFormField(
+                                decoration: InputDecoration(
+                                  hintText: columnKey,
+                                ),
+                                key: UniqueKey(),
+                                initialValue: langs[rowKey]![columnKey],
+                                onChanged: (newValue) => updateCellValue(
+                                    langs, rowKey, columnKey, newValue),
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                  );
+                }).toList(),
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      }
     );
   }
 }
