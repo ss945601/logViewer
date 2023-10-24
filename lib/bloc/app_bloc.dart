@@ -10,6 +10,7 @@ var appBloc = AppBloc();
 class PageName {
   static const String arbPage = "arb";
   static const String logPage = "log";
+  static const String virtualAmberPage = "amberVirtual";
 }
 
 class AppBloc {

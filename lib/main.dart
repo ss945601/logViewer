@@ -5,6 +5,7 @@ import 'package:latticework/page/file_browser.dart';
 import 'package:latticework/page/log_analysis_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:latticework/page/virtual_amber_page.dart';
 
 void main() {
   runApp(GetMaterialApp(
@@ -29,11 +30,19 @@ class MyApp extends StatelessWidget {
                 Navigator.pop(context);
               },
             ),
-            if(!kIsWeb) 
+            if (!kIsWeb)
               ListTile(
                 title: Text('Arb Tool'),
                 onTap: () {
                   appBloc.switchPageSink.add(PageName.arbPage);
+                  Navigator.pop(context);
+                },
+              ),
+            if (!kIsWeb)
+              ListTile(
+                title: Text('virtual amber Tool'),
+                onTap: () {
+                  appBloc.switchPageSink.add(PageName.virtualAmberPage);
                   Navigator.pop(context);
                 },
               ),
@@ -57,6 +66,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   final Widget arbPage = FileBrowserPage();
   final Widget logPage = LogAnalysisPage();
+  final Widget virtualAmberPage = VirtualAmberPage();
   late Widget currentPage;
 
   @override
@@ -77,6 +87,9 @@ class _MainPageState extends State<MainPage> {
               break;
             case PageName.logPage:
               currentPage = logPage;
+              break;
+            case PageName.virtualAmberPage:
+              currentPage = virtualAmberPage;
               break;
             default:
               currentPage = logPage;

@@ -41,6 +41,8 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   flutter_quill: ^7.2.11
   get: ^4.6.5
+  path_provider: ^2.1.1
+  process_run: ^0.13.2
   rxdart: ^0.27.7
 
 dev_dependencies:
@@ -66,7 +68,7 @@ flutter:
   uses-material-design: true
   # To add assets to your application, add an assets section, like this:
   # assets:
-  #   - appIcon.png
+  #   - assets/files/
   #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
