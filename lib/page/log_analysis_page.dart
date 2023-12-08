@@ -295,7 +295,7 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
           return SizedBox(
             child: AlertDialog(
               title: Text('Add filters'),
-              content: Container(width: Get.width/2, child: content),
+              content: Container(width: Get.width / 2, child: content),
               actions: <Widget>[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -374,7 +374,8 @@ class _FilterContentState extends State<FilterContent> {
                         children: [
                           Expanded(
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 2),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 2),
                               child: TextFormField(
                                 textAlign: TextAlign.center,
                                 initialValue: FilterContent.filterItems[i][j],
@@ -407,7 +408,9 @@ class _FilterContentState extends State<FilterContent> {
                       ),
                       IconButton(
                           onPressed: () {
-                            FilterContent.filterItems[i].removeLast();
+                            setState(() {
+                              FilterContent.filterItems[i].removeLast();
+                            });
                           },
                           icon: Icon(Icons.remove),
                           iconSize: 15,
@@ -417,8 +420,11 @@ class _FilterContentState extends State<FilterContent> {
                   )
                 ],
               ),
-              if (i != FilterContent.filterItems.length-1)
-                Text("or",style: TextStyle(fontSize: 20),)
+              if (i != FilterContent.filterItems.length - 1)
+                Text(
+                  "or",
+                  style: TextStyle(fontSize: 20),
+                )
             ],
           ),
         SizedBox(height: 10),
