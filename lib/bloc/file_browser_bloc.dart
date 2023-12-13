@@ -103,6 +103,7 @@ class FileBrowserBloc {
         var text = arbModelToJson(newLang[title]!).replaceAll(",\"", ",\n  \"");
         text = text.substring(1, text.length - 1);
         text = "{\n" + "  " + text + "\n}";
+        text = text.replaceAll('":"', '": "');
         file.writeAsString(text);
       }
     }
