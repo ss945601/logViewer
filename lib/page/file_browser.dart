@@ -1,3 +1,4 @@
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:latticework/bloc/file_browser_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -139,10 +140,68 @@ class _FileBrowserPageState extends State<FileBrowserPage> {
                   backgroundColor: Colors.orange,
                   foregroundColor: Colors.white),
               onPressed: () {
-                _fileBrowserBloc.exportToCSV(tmpLang);
+                showTranslateDialogWithInput(context, tmpLang);
               },
               label: Text("Export csv"))
       ],
+    );
+  }
+
+  Future<void> showTranslateDialogWithInput(
+      BuildContext context, Map<String, Map<String, String>> lang) async {
+    final _formKey = GlobalKey<FormState>();
+    String filename = "";
+    bool noTranslation = false;
+
+    return await showDialog<void>(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (BuildContext context, setState) {
+          return AlertDialog(
+            title: Text('Translate File'),
+            content: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    decoration: InputDecoration(labelText: 'File Name'),
+                    onChanged: (value) => filename = value!,
+                    validator: (value) => value?.isEmpty ?? true
+                        ? 'Please enter a filename'
+                        : null,
+                  ),
+                  CheckboxListTile(
+                    title: Text('No translation'),
+                    value: noTranslation,
+                    onChanged: (value) =>
+                        setState(() => noTranslation = value!),
+                  ),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Cancel'),
+                onPressed: () => Navigator.pop(context),
+              ),
+              TextButton(
+                child: Text('Export csv'),
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    if (!filename.contains(".csv")) {
+                      filename = filename + ".csv";
+                    }
+                    await _fileBrowserBloc.exportToCSV(lang,
+                        fileName: filename, filterNoTranslation: noTranslation);
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 

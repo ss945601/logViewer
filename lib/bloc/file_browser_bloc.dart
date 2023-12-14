@@ -149,7 +149,8 @@ class FileBrowserBloc {
   }
 
   Future<void> exportToCSV(Map<String, Map<String, String>> dataMap,
-      {String fileName = "output.csv"}) async {
+      {String fileName = "output.csv",
+      bool filterNoTranslation = true}) async {
     String? selectedDirectory =
         await FilePicker.platform.getDirectoryPath() ?? "";
     if (selectedDirectory != "") {
@@ -177,12 +178,20 @@ class FileBrowserBloc {
         });
         csvData.add(row);
       });
-
+      List<List<dynamic>> noTranslateData = [];
+      if (filterNoTranslation) {
+        noTranslateData.add(csvData[0]);
+        for (var i = 0; i < csvData.length; i++) {
+          if (csvData[i][4] == csvData[i][6]) {
+            noTranslateData.add(csvData[i]);
+          }
+        }
+      }
       // Create a CSV converter
       final csvConverter = const ListToCsvConverter();
 
       // Convert CSV data to a string
-      String csvString = csvConverter.convert(csvData);
+      String csvString = csvConverter.convert(filterNoTranslation ? noTranslateData:csvData);
 
       // Define the output file path
       String filePath = selectedDirectory + "/" + fileName;
