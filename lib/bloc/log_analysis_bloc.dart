@@ -111,7 +111,7 @@ class LogAnalysisBloc {
 
   Future<String> askAI(String req) async {
     final request =
-        CompleteText(prompt: req, model: TextDavinci3Model(), maxTokens: 100);
+        CompleteText(prompt: req, maxTokens: 100, model: ModelFromValue(model: 'gemini-pro'));
 
     final response = await _openAI.onCompletion(request: request);
     String content = "";

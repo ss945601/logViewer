@@ -4,6 +4,7 @@ import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_quill/flutter_quill.dart' as qUtil;
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:get/get.dart';
 import 'package:latticework/bloc/app_bloc.dart';
 import 'package:latticework/bloc/log_analysis_bloc.dart';
@@ -69,12 +70,15 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
 
   @override
   Widget build(BuildContext context) {
+    _controller.readOnly = isReadOnly;
     return Container(
       child: Column(
         children: [
           SelectPathBar(),
           Divider(),
-          qUtil.QuillToolbar.basic(controller: _controller),
+          QuillToolbar.simple(
+            configurations: QuillSimpleToolbarConfigurations(controller: _controller),
+          ),
           Divider(),
           Expanded(
             child: Row(
@@ -116,9 +120,10 @@ class _LogAnalysisPageState extends State<LogAnalysisPage> {
                                   notification.scrollDelta!);
                           return true;
                         },
-                        child: qUtil.QuillEditor.basic(
-                          controller: _controller,
-                          readOnly: isReadOnly, // true for view only mode
+                        child: QuillEditor.basic(
+                          configurations: QuillEditorConfigurations(
+                            
+                              controller: _controller),
                         ),
                       )),
                 ),

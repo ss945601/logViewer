@@ -30,24 +30,24 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   badges: ^3.1.1
-  chat_gpt_sdk: ^2.2.3
-  csv: ^5.0.2
+  chat_gpt_sdk: ^3.0.4
+  csv: ^6.0.0
   cupertino_icons: ^1.0.2
-  file_picker: ^5.3.2
+  file_picker: ^8.0.5
   file_saver: ^0.2.7
   flutter:
     sdk: flutter
   flutter_easyloading: ^3.0.5
   flutter_launcher_icons: ^0.13.1
-  flutter_quill: ^7.2.11
+  flutter_quill: ^9.3.11
   get: ^4.6.5
   path_provider: ^2.1.1
-  process_run: ^0.13.2
-  rxdart: ^0.27.7
+  process_run: ^1.0.1
+  rxdart: ^0.28.0
   shared_preferences: ^2.2.2
 
 dev_dependencies:
-  flutter_lints: ^2.0.0
+  flutter_lints: ^4.0.0
   flutter_test:
     sdk: flutter
 
